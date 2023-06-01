@@ -1,5 +1,5 @@
 import 'package:alldogsapp/screens/home_page/home_page.dart';
-import 'package:alldogsapp/utils/favorite_breeds_provider.dart';
+import 'package:alldogsapp/controllers/dogs_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => FavoriteBreedsProvider(),
+      create: (context) => DogsController(),
       child: MaterialApp(
         title: 'Dogs',
         theme: ThemeData(

@@ -1,4 +1,4 @@
-import 'package:alldogsapp/utils/data.dart';
+import 'package:alldogsapp/controllers/dogs_controller.dart';
 import 'package:flutter/material.dart';
 
 class BreedImages extends StatelessWidget {
@@ -7,6 +7,7 @@ class BreedImages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dogsController = DogsController();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -26,7 +27,7 @@ class BreedImages extends StatelessWidget {
       ),
       body: Center(
         child: FutureBuilder(
-          future: imagesByDogsBreed(breed),
+          future: dogsController.getBreedImages(breed),
           builder: (context, AsyncSnapshot<List> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressIndicator();

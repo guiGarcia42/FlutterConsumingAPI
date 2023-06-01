@@ -1,17 +1,19 @@
-import 'dart:math';
-
-import 'package:alldogsapp/utils/data.dart';
-import 'package:alldogsapp/utils/favorite_breeds_provider.dart';
+import 'package:alldogsapp/controllers/dogs_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class FavoriteBreeds extends StatelessWidget {
+class FavoriteBreeds extends StatefulWidget {
   const FavoriteBreeds({super.key});
 
   @override
+  State<FavoriteBreeds> createState() => _FavoriteBreedsState();
+}
+
+class _FavoriteBreedsState extends State<FavoriteBreeds> {
+  @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<FavoriteBreedsProvider>(context);
-    final breedsList = provider.breeds;
+    final provider = Provider.of<DogsController>(context);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -21,18 +23,14 @@ class FavoriteBreeds extends StatelessWidget {
         ),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: <Color>[Colors.black, Colors.green],
-            ),
+            color: Colors.green,
           ),
         ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: ListView.builder(
-          itemCount: breedsList.length,
+          itemCount: provider.favoriteBreeds.length,
           itemBuilder: (_, index) {
             return Card(
               color: Colors.lightGreen,
@@ -42,14 +40,14 @@ class FavoriteBreeds extends StatelessWidget {
                 children: [
                   ListTile(
                     title: Text(
-                      breedsList.elementAt(index),
-                      style: TextStyle(
+                      provider.favoriteBreeds[index],
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
                     ),
-                    subtitle: Text(
+                    subtitle: const Text(
                       "Images:",
                       style: TextStyle(
                         color: Colors.white,
@@ -58,20 +56,24 @@ class FavoriteBreeds extends StatelessWidget {
                     ),
                     trailing: IconButton(
                       onPressed: () {
-                        provider.toggleFavorite(breedsList.elementAt(index));
+                        setState(() {
+                          provider
+                              .toggleFavorite(provider.favoriteBreeds[index]);
+                        });
                       },
-                      icon: provider.isFavorite(breedsList.elementAt(index))
-                          ? Icon(Icons.favorite)
-                          : Icon(Icons.favorite_border),
+                      icon: provider.isFavorite(provider.favoriteBreeds[index])
+                          ? const Icon(Icons.favorite)
+                          : const Icon(Icons.favorite_border),
                     ),
                   ),
                   FutureBuilder(
-                    future: imagesByDogsBreed(breedsList[index]),
-                    builder: (context, AsyncSnapshot<List> snapshot) {
+                    future:
+                        provider.getBreedImages(provider.favoriteBreeds[index]),
+                    builder: (context, AsyncSnapshot<List<String>> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
                       }
-                      List? imagesList = snapshot.data;
+                      List<String>? imagesList = snapshot.data;
                       if (imagesList == null) {
                         return const Text("Something went wrong");
                       }
@@ -80,6 +82,7 @@ class FavoriteBreeds extends StatelessWidget {
                         gridSize = imagesList.length;
                       }
                       return GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(

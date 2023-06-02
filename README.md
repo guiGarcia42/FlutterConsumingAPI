@@ -1,6 +1,10 @@
-# alldogsapp
+# Consuming Dog API challenge
 
-A new Flutter project.
+I was challenged to create an App that consume a dog API and show as a list of dog breeds, another list of images of a selected breed and create a list of favorite breeds showing the first 5 images of each breed selected as favorite.
+
+Here it is the DOG api: https://dog.ceo/dog-api/documentation/
+
+I also had to save the list of my favorite breeds on the phone storage, I've used Shared-Preferences library to be able to save this List<String> locally.
 
 ## Getting Started
 

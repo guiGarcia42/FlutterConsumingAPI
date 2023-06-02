@@ -1,9 +1,9 @@
 import 'package:alldogsapp/controllers/dogs_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class FavoriteBreeds extends StatefulWidget {
-  const FavoriteBreeds({super.key});
+  final DogsController dogsController;
+  const FavoriteBreeds({super.key, required this.dogsController});
 
   @override
   State<FavoriteBreeds> createState() => _FavoriteBreedsState();
@@ -12,8 +12,6 @@ class FavoriteBreeds extends StatefulWidget {
 class _FavoriteBreedsState extends State<FavoriteBreeds> {
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<DogsController>(context);
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -30,7 +28,7 @@ class _FavoriteBreedsState extends State<FavoriteBreeds> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: ListView.builder(
-          itemCount: provider.favoriteBreeds.length,
+          itemCount: widget.dogsController.favoriteBreeds.length,
           itemBuilder: (_, index) {
             return Card(
               color: Colors.lightGreen,
@@ -40,7 +38,7 @@ class _FavoriteBreedsState extends State<FavoriteBreeds> {
                 children: [
                   ListTile(
                     title: Text(
-                      provider.favoriteBreeds[index],
+                      widget.dogsController.favoriteBreeds[index],
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -57,18 +55,19 @@ class _FavoriteBreedsState extends State<FavoriteBreeds> {
                     trailing: IconButton(
                       onPressed: () {
                         setState(() {
-                          provider
-                              .toggleFavorite(provider.favoriteBreeds[index]);
+                          widget.dogsController.toggleFavorite(
+                              widget.dogsController.favoriteBreeds[index]);
                         });
                       },
-                      icon: provider.isFavorite(provider.favoriteBreeds[index])
+                      icon: widget.dogsController.isFavorite(
+                              widget.dogsController.favoriteBreeds[index])
                           ? const Icon(Icons.favorite)
                           : const Icon(Icons.favorite_border),
                     ),
                   ),
                   FutureBuilder(
-                    future:
-                        provider.getBreedImages(provider.favoriteBreeds[index]),
+                    future: widget.dogsController.getBreedImages(
+                        widget.dogsController.favoriteBreeds[index]),
                     builder: (context, AsyncSnapshot<List<String>> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();

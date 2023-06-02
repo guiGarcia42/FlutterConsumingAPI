@@ -3,7 +3,6 @@ import 'package:alldogsapp/screens/breed_images/breed_images.dart';
 import 'package:alldogsapp/screens/favorite_breeds/favorite_breeds.dart';
 import 'package:alldogsapp/controllers/dogs_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,10 +12,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final dogsController = DogsController();
+  @override
+  void initState() {
+    super.initState();
+    dogsController.getFavoritesBreeds().then(
+          (value) => setState(() {}),
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<DogsController>(context);
-    final dogsController = DogsController();
+    //final provider = Provider.of<DogsController>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -41,8 +48,10 @@ class _HomePageState extends State<HomePage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressIndicator();
             }
-            DogBreeds? breedsList = snapshot.data;
-            if (breedsList == null) return const Text("Something went wrong");
+            if (snapshot.hasError || snapshot.data == null) {
+              return const Text("Something went wrong");
+            }
+            DogBreeds breedsList = snapshot.data!;
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: ListView.builder(
@@ -77,11 +86,12 @@ class _HomePageState extends State<HomePage> {
                             trailing: StatefulBuilder(
                               builder: (context, setState) {
                                 return IconButton(
-                                  onPressed: () {
-                                    setState(() => provider.toggleFavorite(
-                                        breedsList.breeds.elementAt(index)));
+                                  onPressed: () async {
+                                    dogsController.toggleFavorite(
+                                        breedsList.breeds.elementAt(index));
+                                    setState(() {});
                                   },
-                                  icon: provider.isFavorite(
+                                  icon: dogsController.isFavorite(
                                           breedsList.breeds.elementAt(index))
                                       ? const Icon(Icons.favorite)
                                       : const Icon(Icons.favorite_border),
@@ -103,7 +113,8 @@ class _HomePageState extends State<HomePage> {
         onPressed: () {
           Navigator.of(context)
               .push(MaterialPageRoute(
-                builder: (context) => const FavoriteBreeds(),
+                builder: (context) =>
+                    FavoriteBreeds(dogsController: dogsController),
               ))
               .then((value) => setState(
                     () {},

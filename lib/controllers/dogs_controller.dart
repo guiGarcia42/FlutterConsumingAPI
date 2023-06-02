@@ -2,12 +2,18 @@ import 'dart:convert';
 import 'package:alldogsapp/models/breed.dart';
 import 'package:alldogsapp/models/dog_breeds.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class DogsController extends ChangeNotifier {
   DogBreeds? dogs;
   Breed? breed;
   List<String> favoriteBreeds = [];
+
+  Future getFavoritesBreeds() async {
+    final prefs = await SharedPreferences.getInstance();
+    favoriteBreeds = prefs.getStringList('favoriteBreeds') ?? [];
+  }
 
   Future<DogBreeds?> getAllDogBreeds() async {
     final response =
@@ -37,15 +43,13 @@ class DogsController extends ChangeNotifier {
     return favoriteBreeds.contains(breed);
   }
 
-  void toggleFavorite(String breed) {
+  void toggleFavorite(String breed) async {
+    final prefs = await SharedPreferences.getInstance();
     if (isFavorite(breed)) {
       favoriteBreeds.remove(breed);
     } else {
       favoriteBreeds.add(breed);
     }
-  }
-
-  void clearFavorite() {
-    favoriteBreeds = [];
+    await prefs.setStringList('favoriteBreeds', favoriteBreeds);
   }
 }
